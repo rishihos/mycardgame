@@ -6,7 +6,7 @@ const RoomManager = require('./roomManager');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -25,6 +25,10 @@ io.on('connection', (socket) => {
     socket.on('startGame', () => roomManager.startGame(socket));
     socket.on('selectPowerColour', (suit) => roomManager.handlePowerColourSelection(socket, suit));
     socket.on('playCard', (cardIndex) => roomManager.handlePlayCard(socket, cardIndex));
+    socket.on('assignTeam', (data) => roomManager.assignTeam(socket, data.targetPlayerId, data.newTeam));
+    socket.on('updateTeamNames', (data) => roomManager.updateTeamNames(socket, data.t1Name, data.t2Name));
+    socket.on('rematch', () => roomManager.rematch(socket));
+    socket.on('delegatePC', (playerId) => roomManager.handleDelegatePC(socket, playerId));
     socket.on('disconnect', () => roomManager.handleDisconnect(socket));
 });
 
