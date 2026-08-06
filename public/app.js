@@ -4,13 +4,14 @@ let myName = sessionStorage.getItem('code10_playerName') || '';
 let currentRoom = null;
 let gameState = null;
 let selectedCardIndex = -1;
+let modalShownTime = 0; // Fixes Ghost Clicks
 
 if (!myPlayerId) {
     myPlayerId = 'P_' + Math.random().toString(36).substr(2, 9);
     sessionStorage.setItem('code10_playerId', myPlayerId);
 }
 
-// ---- Audio Manager using Web Audio API for synthetic SFX (no missing files issue) ----
+// ---- Audio Manager ----
 class AudioManager {
     constructor() {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -95,7 +96,7 @@ socket.on('lobbyUpdate', (data) => {
     currentRoom = data.roomCode; document.getElementById('display-room-code').textContent = data.roomCode;
     document.getElementById('player-count').textContent = `${data.players.length}/4`;
     
-    let isRoomCreator = data.players.find(p => p.id === myPlayerId && p.position === 0);
+    let isRoomCreator = data.players.find(p => p.id === myPlayerId && p.isCreator);
     const list = document.getElementById('player-list'); list.innerHTML = '';
     
     data.players.forEach(p => {
@@ -105,7 +106,7 @@ socket.on('lobbyUpdate', (data) => {
             controls = `<div class="host-controls"><button onclick="socket.emit('assignTeam', {targetPlayerId: '${p.id}', newTeam: '${opposite}'})">Move to ${opposite}</button></div>`;
         }
         const tName = data.teamNames[p.team] || p.team;
-        list.innerHTML += `<li><div>${p.position === 0 ? '👑 ' : ''}${p.name} <span class="team-badge">${tName}</span> <span style="color:${p.connected ? '#4ade80' : '#ef4444'}">●</span></div>${controls}</li>`;
+        list.innerHTML += `<li><div>${p.isCreator ? '👑 ' : ''}${p.name} <span class="team-badge">${tName}</span> <span style="color:${p.connected ? '#4ade80' : '#ef4444'}">●</span></div>${controls}</li>`;
     });
 
     if(isRoomCreator) {
@@ -177,7 +178,6 @@ function renderGame() {
 
     // Rule 1: Initial 5 cards visibility
     const hideRest = (gameState.gameState === 'WAITING_FOR_POWER_COLOUR' && me.position === gameState.pcChooserPosition);
-    let flipClassTrigger = '';
 
     gameState.players.forEach(p => {
         const relPos = getRelativePosition(me.position, p.position);
@@ -185,7 +185,7 @@ function renderGame() {
         switch(relPos) { case 'bottom': spotId = 'my-label'; handId = 'my-hand'; break; case 'top': spotId = 'spot-partner'; handId = 'hand-partner'; break; case 'left': spotId = 'spot-left'; handId = 'hand-left'; break; case 'right': spotId = 'spot-right'; handId = 'hand-right'; break; }
         
         const label = document.querySelector(`#${spotId}`);
-        label.innerHTML = `<div class="p-name">${p.position === 0 ? '👑 ' : ''}${p.name} ${!p.connected ? '[Offline]' : ''}</div><div class="p-team">${gameState.teamNames[p.team]}</div>`;
+        label.innerHTML = `<div class="p-name">${p.isCreator ? '👑 ' : ''}${p.name} ${!p.connected ? '[Offline]' : ''}</div><div class="p-team">${gameState.teamNames[p.team]}</div>`;
         if (p.isTurn) label.classList.add('active-turn'); else label.classList.remove('active-turn');
 
         const handContainer = document.getElementById(handId);
@@ -211,8 +211,14 @@ function renderGame() {
     else playBtn.classList.add('hidden');
 
     const modal = document.getElementById('power-colour-modal');
-    if (gameState.gameState === 'WAITING_FOR_POWER_COLOUR' && me.position === gameState.pcChooserPosition && !gameState.powerSuit) modal.classList.remove('hidden');
-    else modal.classList.add('hidden');
+    if (gameState.gameState === 'WAITING_FOR_POWER_COLOUR' && me.position === gameState.pcChooserPosition && !gameState.powerSuit) {
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            modalShownTime = Date.now(); // Record exactly when the modal appeared
+        }
+    } else {
+        modal.classList.add('hidden');
+    }
 
     const delegateModal = document.getElementById('delegate-pc-modal');
     if (gameState.gameState === 'WAITING_FOR_PC_DELEGATE' && me.team === gameState.choosingTeam) {
@@ -227,21 +233,34 @@ function renderGame() {
     }
 }
 
+// FIX: GHOST CLICK PREVENTER
 document.querySelectorAll('.suit-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+        // If the modal hasn't been visible for at least 500ms, ignore the ghost click!
+        if (Date.now() - modalShownTime < 500) return; 
+        
         audio.playClick();
-        socket.emit('selectPowerColour', e.target.getAttribute('data-suit'));
+        socket.emit('selectPowerColour', e.currentTarget.getAttribute('data-suit'));
         document.getElementById('power-colour-modal').classList.add('hidden');
     });
 });
 
 socket.on('startMatchAnimation', () => {
     audio.playMatchStart();
-    const myHand = document.getElementById('my-hand').children;
+    
+    // Fix Blank Cards during flip by injecting their real data first
+    const handContainer = document.getElementById('my-hand');
+    handContainer.innerHTML = '';
+    gameState.myHand.forEach((card, index) => {
+        const html = createCardHTML(card, index, true, false); // force reveal
+        handContainer.insertAdjacentHTML('beforeend', html);
+    });
+
+    const myHand = handContainer.children;
     for(let i=5; i<myHand.length; i++) {
-        myHand[i].classList.remove('card-back');
         myHand[i].classList.add('flip-reveal');
     }
+    
     const overlay = document.getElementById('match-start-overlay');
     const txt = document.getElementById('countdown-text');
     overlay.classList.remove('hidden');
@@ -282,7 +301,7 @@ socket.on('gameOver', (resultHTML) => {
     
     // Only show rematch to host
     const me = gameState.players.find(p => p.id === myPlayerId);
-    if (me && me.position === 0) document.getElementById('btn-rematch').classList.remove('hidden');
+    if (me && me.isCreator) document.getElementById('btn-rematch').classList.remove('hidden');
     else document.getElementById('btn-rematch').classList.add('hidden');
 });
 
