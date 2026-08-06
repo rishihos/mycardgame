@@ -1,7 +1,8 @@
 class GameLogic {
-    constructor(players, teamNames, previousWinner) {
+    constructor(players, teamNames, previousWinner, creatorId) {
         this.players = players; 
         this.teamNames = teamNames;
+        this.creatorId = creatorId; // Securely binds to the creator
         this.hands = {}; 
         this.turn = 0; 
         this.powerSuit = null;
@@ -12,15 +13,15 @@ class GameLogic {
         this.isGameOver = false;
         this.winningTeamId = null;
 
-        // PC Selection Rules
         if (previousWinner === 'Team 1' || previousWinner === 'Team 2') {
             this.gameState = 'WAITING_FOR_PC_DELEGATE';
             this.pcChooserPosition = null;
             this.choosingTeam = previousWinner;
         } else {
             this.gameState = 'WAITING_FOR_POWER_COLOUR'; 
-            this.pcChooserPosition = 0; // Default to Room Creator
-            this.turn = 0;
+            const creator = this.players.find(p => p.id === this.creatorId);
+            this.pcChooserPosition = creator ? creator.position : 0;
+            this.turn = this.pcChooserPosition;
         }
 
         this.dealCards();
@@ -73,7 +74,7 @@ class GameLogic {
         if (!player || player.position !== this.pcChooserPosition) return false;
         
         this.powerSuit = suit;
-        this.gameState = 'STARTING_MATCH'; // Animation phase
+        this.gameState = 'STARTING_MATCH'; 
         return true;
     }
 
@@ -167,7 +168,8 @@ class GameLogic {
         const clientPlayers = this.players.map(p => ({
             id: p.id, name: p.name, team: p.team, position: p.position,
             cardCount: this.hands[p.id] ? this.hands[p.id].length : 0,
-            connected: p.connected, isTurn: this.players[this.turn].id === p.id
+            connected: p.connected, isTurn: this.players[this.turn].id === p.id,
+            isCreator: p.id === this.creatorId
         }));
         
         return {
