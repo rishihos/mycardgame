@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>10 Code Card Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="view active">
+        <div class="glass-panel text-center">
+            <h1>Welcome to My Card Game</h1>
+            <h2 class="game-title">10 Code Card Game</h2>
+            <button id="btn-play-now" class="primary-btn pulse">▶ PLAY NOW</button>
+            <button id="btn-audio-settings-landing" class="icon-btn margin-top">🔊 Audio Settings</button>
+        </div>
+    </div>
+
+    <!-- Lobby Page -->
+    <div id="lobby-page" class="view">
+        <div class="glass-panel">
+            <h2>Multiplayer Lobby</h2>
+            <div class="lobby-controls">
+                <input type="text" id="player-name" placeholder="Enter Your Name" maxlength="12">
+                <div class="actions">
+                    <button id="btn-create-room" class="primary-btn">Create Room</button>
+                    <div class="join-group">
+                        <input type="text" id="room-code-input" placeholder="Room Code" maxlength="5">
+                        <button id="btn-join-room" class="secondary-btn">Join</button>
+                    </div>
+                </div>
+            </div>
+            <div id="room-details" class="hidden">
+                <div class="room-header">
+                    <span>Room: <strong id="display-room-code">----</strong></span>
+                    <button id="btn-copy-code" class="icon-btn">Copy</button>
+                </div>
+                
+                <!-- Team Names Config (Host Only) -->
+                <div id="team-names-config" class="team-names-container hidden">
+                    <input type="text" id="input-t1-name" placeholder="Team 1 Name" maxlength="15">
+                    <input type="text" id="input-t2-name" placeholder="Team 2 Name" maxlength="15">
+                </div>
+
+                <div class="player-list-container">
+                    <h3>Players: <span id="player-count">1/4</span></h3>
+                    <ul id="player-list"></ul>
+                </div>
+                <div class="room-actions">
+                    <button id="btn-start-game" class="primary-btn hidden">Start Game</button>
+                    <button id="btn-leave-room" class="danger-btn">Leave</button>
+                </div>
+            </div>
+            <button id="btn-rules-lobby" class="secondary-btn margin-top">Rules</button>
+        </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page" class="view">
+        <div class="game-hud">
+            <div class="room-info">Room: <span id="game-room-code"></span> | Rnd: <span id="round-display">1</span>/13</div>
+            <div class="power-color-banner">POWER COLOUR: <span id="game-power-colour">Waiting...</span></div>
+            <div class="hud-buttons">
+                <button id="btn-audio-settings-game" class="icon-btn">🔊</button>
+                <button id="btn-rules-game" class="icon-btn">Rules</button>
+                <button id="btn-leave-game" class="danger-btn small">Leave</button>
+            </div>
+        </div>
+
+        <div class="score-boards">
+            <div class="score-panel team1-panel">
+                <div class="team-title" id="t1-title">TEAM 1</div>
+                <div class="score-stats">Rounds Won: <span id="t1-rounds">0</span></div>
+                <div class="score-stats highlight">10 Cards: <span id="t1-tens-count">0</span></div>
+                <div class="ten-cards-list" id="t1-tens-list"></div>
+            </div>
+            <div class="score-panel team2-panel">
+                <div class="team-title" id="t2-title">TEAM 2</div>
+                <div class="score-stats">Rounds Won: <span id="t2-rounds">0</span></div>
+                <div class="score-stats highlight">10 Cards: <span id="t2-tens-count">0</span></div>
+                <div class="ten-cards-list" id="t2-tens-list"></div>
+            </div>
+        </div>
+
+        <div class="card-table">
+            <div class="player-spot pos-top" id="spot-partner"><div class="player-label"><div class="p-name">Partner</div><div class="p-team">Team</div></div><div class="mini-hand" id="hand-partner"></div></div>
+            <div class="player-spot pos-left" id="spot-left"><div class="player-label"><div class="p-name">L. Opponent</div><div class="p-team">Team</div></div><div class="mini-hand" id="hand-left"></div></div>
+            <div class="player-spot pos-right" id="spot-right"><div class="player-label"><div class="p-name">R. Opponent</div><div class="p-team">Team</div></div><div class="mini-hand" id="hand-right"></div></div>
+            <div class="play-area" id="play-area"></div>
+            <div class="player-spot pos-bottom" id="spot-me"><div class="player-label" id="my-label"><div class="p-name">Me</div><div class="p-team">Team</div></div><div class="my-hand" id="my-hand"></div></div>
+            <button id="btn-play-selected" class="primary-btn hidden floating-btn">PLAY CARD</button>
+        </div>
+
+        <!-- Start Countdown Overlay -->
+        <div id="match-start-overlay" class="overlay-text hidden">
+            <div id="countdown-text" class="huge-countdown">3</div>
+        </div>
+        <div id="trick-winner-overlay" class="overlay-text hidden"></div>
+    </div>
+
+    <!-- Power Colour Selection Modal -->
+    <div id="power-colour-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h2 class="gold-text">Select Power Colour</h2>
+            <p>Select the public trump suit based on your 5 visible cards.</p>
+            <div class="suit-selector">
+                <button class="suit-btn" data-suit="spades">♠</button>
+                <button class="suit-btn red" data-suit="hearts">♥</button>
+                <button class="suit-btn" data-suit="clubs">♣</button>
+                <button class="suit-btn red" data-suit="diamonds">♦</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delegate PC Modal (Rematch) -->
+    <div id="delegate-pc-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h2 class="gold-text">Your Team Won!</h2>
+            <p>Who will select the Power Colour for the next match?</p>
+            <div class="delegate-buttons margin-top" id="delegate-btn-container"></div>
+        </div>
+    </div>
+
+    <!-- Audio Settings Modal -->
+    <div id="audio-settings-modal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <h2>Audio Settings</h2>
+            <div class="audio-control"><label>Mute All</label><input type="checkbox" id="mute-all-toggle"></div>
+            <div class="audio-control"><label>Master Volume</label><input type="range" id="master-vol" min="0" max="1" step="0.1" value="1"></div>
+            <div class="audio-control"><label>SFX Volume</label><input type="range" id="sfx-vol" min="0" max="1" step="0.1" value="1"></div>
+            <div class="audio-control"><label>Music Volume</label><input type="range" id="music-vol" min="0" max="1" step="0.1" value="0.5"></div>
+            <button id="btn-close-audio" class="primary-btn margin-top">Save & Close</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+    
+    <div id="game-over-modal" class="modal hidden">
+        <div class="modal-content glass-panel text-center">
+            <h1 id="winner-text" class="gold-text"></h1>
+            <button id="btn-rematch" class="primary-btn margin-top">Rematch</button>
+            <button id="btn-return-lobby" class="secondary-btn margin-top">Return to Lobby</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
