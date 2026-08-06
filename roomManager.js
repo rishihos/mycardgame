@@ -18,6 +18,7 @@ class RoomManager {
         const roomCode = this.generateRoomCode();
         this.rooms[roomCode] = { 
             id: roomCode, 
+            creatorId: socket.playerId, // SECURES CREATOR IDENTITY
             players: [], 
             game: null, 
             state: 'LOBBY',
@@ -39,7 +40,6 @@ class RoomManager {
         } else {
             if (room.players.length >= 4) return socket.emit('errorMsg', 'Room is full.');
             
-            // FIX: Find the first available empty seat (0 to 3)
             const takenSeats = room.players.map(p => p.position);
             let emptySeat = 0;
             while (takenSeats.includes(emptySeat)) { emptySeat++; }
@@ -61,17 +61,14 @@ class RoomManager {
         const room = this.rooms[roomCode];
         if (!room || room.state !== 'LOBBY') return;
         
-        const requester = room.players.find(p => p.id === socket.playerId);
-        if (requester.position !== 0) return; // Only Room Creator can arrange
+        if (socket.playerId !== room.creatorId) return; // FIX APPLIED
 
         const target = room.players.find(p => p.id === targetPlayerId);
         if (!target || target.team === newTeam) return;
 
-        // Check if newTeam is full
         const teamPlayers = room.players.filter(p => p.team === newTeam);
         if (teamPlayers.length >= 2) return socket.emit('errorMsg', `${newTeam} is full. Move someone out first.`);
 
-        // Find available seat for the new team
         const allowedSeats = newTeam === 'Team 1' ? [0, 2] : [1, 3];
         const takenSeats = room.players.map(p => p.position);
         const newSeat = allowedSeats.find(seat => !takenSeats.includes(seat));
@@ -85,8 +82,7 @@ class RoomManager {
         const roomCode = this.playerToRoom[socket.playerId];
         const room = this.rooms[roomCode];
         if (!room || room.state !== 'LOBBY') return;
-        const requester = room.players.find(p => p.id === socket.playerId);
-        if (requester.position !== 0) return;
+        if (socket.playerId !== room.creatorId) return; // FIX APPLIED
         
         if(t1Name) room.teamNames['Team 1'] = t1Name.substring(0, 15);
         if(t2Name) room.teamNames['Team 2'] = t2Name.substring(0, 15);
@@ -127,8 +123,7 @@ class RoomManager {
         }
     }
     updateLobby(room) {
-        const playerList = room.players.map(p => ({ id: p.id, name: p.name, team: p.team, connected: p.connected, position: p.position }));
-        // Ensure strictly 2 players per team before allowing start
+        const playerList = room.players.map(p => ({ id: p.id, name: p.name, team: p.team, connected: p.connected, position: p.position, isCreator: p.id === room.creatorId }));
         const t1Count = room.players.filter(p => p.team === 'Team 1').length;
         const t2Count = room.players.filter(p => p.team === 'Team 2').length;
         const canStart = room.players.length === 4 && t1Count === 2 && t2Count === 2;
@@ -139,11 +134,11 @@ class RoomManager {
         const roomCode = this.playerToRoom[socket.playerId];
         const room = this.rooms[roomCode];
         if (!room || room.players.length !== 4) return;
-        const player = room.players.find(p => p.id === socket.playerId);
-        if (player.position !== 0) return socket.emit('errorMsg', 'Only the room creator can start the game.');
+        
+        if (socket.playerId !== room.creatorId) return socket.emit('errorMsg', 'Only the room creator can start the game.');
 
         room.state = 'GAME';
-        room.game = new GameLogic(room.players, room.teamNames, room.previousWinner);
+        room.game = new GameLogic(room.players, room.teamNames, room.previousWinner, room.creatorId);
         this.io.to(roomCode).emit('gameStarted');
         this.sendGameState(room);
     }
@@ -152,10 +147,9 @@ class RoomManager {
         const roomCode = this.playerToRoom[socket.playerId];
         const room = this.rooms[roomCode];
         if (!room || room.state !== 'GAME') return;
-        const player = room.players.find(p => p.id === socket.playerId);
-        if (player.position !== 0) return socket.emit('errorMsg', 'Only the room creator can restart.');
+        if (socket.playerId !== room.creatorId) return socket.emit('errorMsg', 'Only the room creator can restart.');
         
-        room.previousWinner = room.game.winningTeamId; // 'Team 1' or 'Team 2' or 'DRAW'
+        room.previousWinner = room.game.winningTeamId; 
         this.startGame(socket);
     }
 
@@ -172,10 +166,8 @@ class RoomManager {
         const room = this.rooms[roomCode];
         if (room && room.game && room.game.setPowerColour(socket.playerId, suit)) {
             this.sendGameState(room);
-            // Trigger the premium flip animation on clients
             this.io.to(roomCode).emit('startMatchAnimation');
             
-            // Wait 4 seconds for the animation (3..2..1) before enabling play
             setTimeout(() => {
                 room.game.startPlaying();
                 this.sendGameState(room);
@@ -192,7 +184,6 @@ class RoomManager {
             const result = room.game.playCard(socket.playerId, cardIndex);
             if (result.error) socket.emit('errorMsg', result.error);
             else {
-                // Broadcast card thrown so others hear the sound
                 this.io.to(roomCode).emit('cardThrownSound');
                 this.sendGameState(room);
                 if (result.trickComplete) {
