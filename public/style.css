@@ -9,7 +9,7 @@ body { background: radial-gradient(circle at center, #1e293b, var(--bg-dark)); c
 .view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
 /* Panels and Buttons */
-.glass-panel { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 10; max-width: 90%; width: 450px; }
+.glass-panel { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 10; max-width: 90%; width: 400px; }
 .text-center { text-align: center; } .margin-top { margin-top: 1rem; } .hidden { display: none !important; } .red { color: var(--red); }
 .gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
 h1, h2, h3 { margin-bottom: 1rem; font-weight: 600; }
@@ -22,22 +22,20 @@ button:active { transform: scale(0.95); }
 .danger-btn { background: #991b1b; color: white; }
 .icon-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px;}
 .floating-btn { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 200px; z-index: 100; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { bottom: 100px; opacity: 0; } to { bottom: 130px; opacity: 1; } }
 
-input[type="text"], input[type="range"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; font-size: 1rem; margin-bottom: 1rem; }
+input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; font-size: 1rem; margin-bottom: 1rem; }
 .join-group { display: flex; gap: 10px; margin-top: 10px;}
-
-/* Lobby Team Editing */
-.team-names-container { display: flex; gap: 10px; margin-bottom: 15px;}
 #player-list { list-style: none; padding: 0; margin-bottom: 1rem; }
-#player-list li { padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-.team-badge { font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-left: 5px;}
-.host-controls { display: flex; gap: 5px; }
-.host-controls button { padding: 4px 8px; font-size: 0.75rem; background: #334155; color: white;}
+#player-list li { padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+.room-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
 
-/* HUD & Scores */
+/* Game UI Layout */
 #game-page { background: var(--bg-dark); }
 .game-hud { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(0,0,0,0.7); border-bottom: 2px solid var(--gold); z-index: 100; font-size: 0.9rem; }
 .power-color-banner { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; color: white;}
+
+/* Premium Score Panels */
 .score-boards { position: absolute; top: 60px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 50; pointer-events: none;}
 .score-panel { background: rgba(15, 23, 42, 0.85); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; min-width: 150px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.5); backdrop-filter: blur(5px);}
 .team-title { font-weight: 900; color: var(--gold); font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 5px; padding-bottom: 2px;}
@@ -47,13 +45,11 @@ input[type="text"], input[type="range"] { width: 100%; padding: 12px; border-rad
 .ten-icon { background: white; border-radius: 4px; padding: 2px 5px; color: black; font-weight: bold; border: 1px solid #ccc; font-size: 0.9rem;}
 .ten-icon.red { color: var(--red); }
 
-/* Card Table */
+/* Table and Cards */
 .card-table { position: relative; width: 95vw; height: 75vh; max-width: 1000px; background: radial-gradient(circle, var(--table-green) 0%, #022c22 100%); border: 4px solid var(--gold); border-radius: 120px; margin-top: 80px; box-shadow: inset 0 0 80px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.6); }
 .player-spot { position: absolute; display: flex; flex-direction: column; align-items: center; }
-.player-label { background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 15px; text-align: center; color: #ccc; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; transition: all 0.3s;}
-.player-label .p-name { font-weight: bold; font-size: 0.9rem;}
-.player-label .p-team { font-size: 0.7rem; opacity: 0.8;}
-.player-label.active-turn { color: var(--black); background: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold);}
+.player-label { background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 15px; font-size: 0.9rem; color: #ccc; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; transition: all 0.3s;}
+.player-label.active-turn { color: var(--black); background: var(--gold); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); font-weight: bold;}
 
 .pos-bottom { bottom: -20px; left: 50%; transform: translateX(-50%); z-index: 20;}
 .pos-top { top: 10px; left: 50%; transform: translateX(-50%); }
@@ -61,64 +57,229 @@ input[type="text"], input[type="range"] { width: 100%; padding: 12px; border-rad
 .pos-right { right: 10px; top: 50%; transform: translateY(-50%); }
 
 .my-hand { display: flex; justify-content: center; margin-top: 15px; height: 110px; }
-.playing-card { width: 70px; height: 100px; background: white; border-radius: 8px; border: 1px solid #999; box-shadow: 0 4px 8px rgba(0,0,0,0.5); margin-left: -35px; position: relative; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; justify-content: space-between; padding: 5px; color: black; font-weight: bold; font-size: 1.2rem; transform-style: preserve-3d; }
+.playing-card { width: 70px; height: 100px; background: white; border-radius: 8px; border: 1px solid #999; box-shadow: 0 4px 8px rgba(0,0,0,0.5); margin-left: -35px; position: relative; cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; justify-content: space-between; padding: 5px; color: black; font-weight: bold; font-size: 1.2rem; }
 .my-hand .playing-card:first-child { margin-left: 0; }
-.my-hand .playing-card:not(.card-back):hover:not(.selected) { transform: translateY(-10px); z-index: 10; margin-right: 10px;}
+
+/* Interactive Selection Details */
+.my-hand .playing-card:hover:not(.selected) { transform: translateY(-10px); z-index: 10; margin-right: 10px;}
 .my-hand .playing-card.selected { transform: translateY(-25px) scale(1.05); z-index: 20; box-shadow: 0 0 20px var(--gold); border: 2px solid var(--gold); margin-right: 15px;}
 .playing-card.red-suit { color: var(--red); }
 .card-top { text-align: left; line-height: 1; }
 .card-center { text-align: center; font-size: 2.2rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
 .card-bottom { text-align: right; transform: rotate(180deg); line-height: 1;}
 
-.card-back { background: repeating-linear-gradient(45deg, #1e3a8a, #1e3a8a 5px, #1e40af 5px, #1e40af 10px); border: 2px solid white; cursor: default; }
-
-/* Flip Animation */
-.flip-reveal { animation: flipCard 0.6s ease forwards; }
-@keyframes flipCard { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(90deg) scale(1.1); } 100% { transform: rotateY(0deg) scale(1); } }
-
-/* Mini Hands */
+.card-back { background: repeating-linear-gradient(45deg, #1e3a8a, #1e3a8a 5px, #1e40af 5px, #1e40af 10px); border: 2px solid white; }
 .mini-hand { display: flex; margin-top: 5px; }
 .mini-hand .playing-card { width: 35px; height: 50px; margin-left: -25px; border-radius: 4px; pointer-events: none;}
 .pos-left .mini-hand, .pos-right .mini-hand { flex-direction: column; }
 .pos-left .mini-hand .playing-card, .pos-right .mini-hand .playing-card { margin-left: 0; margin-top: -35px;}
 .mini-hand .playing-card:first-child { margin-left: 0; margin-top: 0;}
 
-/* Play Area */
+/* Play Area & Center Animations */
 .play-area { position: absolute; top: 50%; left: 50%; width: 220px; height: 220px; transform: translate(-50%, -50%); perspective: 1000px;}
-.played-card { position: absolute; pointer-events: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; box-shadow: 0 15px 25px rgba(0,0,0,0.6);}
-@keyframes popIn { 0% { transform: scale(0.2) translate(0, 50px) rotate(15deg); opacity: 0; } 100% { transform: scale(1) translate(0,0) rotate(0deg); opacity: 1; } }
+.played-card { position: absolute; pointer-events: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; box-shadow: 0 15px 25px rgba(0,0,0,0.6);}
+@keyframes popIn { 
+    0% { transform: scale(0.2) translate(0, 50px) rotate(15deg); opacity: 0; } 
+    100% { transform: scale(1) translate(0,0) rotate(0deg); opacity: 1; } 
+}
 .played-bottom { bottom: 10px; left: 50%; margin-left: -35px; }
 .played-top { top: 10px; left: 50%; margin-left: -35px; }
-.played-left { left: 10px; top: 50%; margin-top: -50px; transform: rotate(90deg) !important; animation: popInLeft 0.3s forwards;}
-.played-right { right: 10px; top: 50%; margin-top: -50px; transform: rotate(-90deg) !important; animation: popInRight 0.3s forwards;}
+.played-left { left: 10px; top: 50%; margin-top: -50px; transform: rotate(90deg) !important; animation: popInLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}
+.played-right { right: 10px; top: 50%; margin-top: -50px; transform: rotate(-90deg) !important; animation: popInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}
 @keyframes popInLeft { 0% { transform: scale(0.2) rotate(45deg); opacity: 0; } 100% { transform: scale(1) rotate(90deg); opacity: 1; } }
 @keyframes popInRight { 0% { transform: scale(0.2) rotate(-135deg); opacity: 0; } 100% { transform: scale(1) rotate(-90deg); opacity: 1; } }
+
 .played-card.highlight-winner { box-shadow: 0 0 30px var(--gold); border: 2px solid var(--gold); z-index: 10;}
 
+/* Trick Winner Sweep Animation */
+.play-area.sweep-top .played-card { animation: sweepTop 0.8s ease-in forwards; }
+.play-area.sweep-bottom .played-card { animation: sweepBottom 0.8s ease-in forwards; }
+.play-area.sweep-left .played-card { animation: sweepLeft 0.8s ease-in forwards; }
+.play-area.sweep-right .played-card { animation: sweepRight 0.8s ease-in forwards; }
+@keyframes sweepTop { to { transform: translate(0, -300px) scale(0.3); opacity: 0; } }
+@keyframes sweepBottom { to { transform: translate(0, 300px) scale(0.3); opacity: 0; } }
+@keyframes sweepLeft { to { transform: translate(-300px, 0) scale(0.3); opacity: 0; } }
+@keyframes sweepRight { to { transform: translate(300px, 0) scale(0.3); opacity: 0; } }
+
 /* Overlays */
-.overlay-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); border: 2px solid var(--gold); padding: 15px 30px; border-radius: 12px; color: var(--gold); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 30px rgba(251, 191, 36, 0.5); z-index: 200; text-align: center; }
-.huge-countdown { font-size: 5rem; color: #fff; text-shadow: 0 0 20px var(--gold); animation: pulse 1s infinite; }
+.overlay-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); border: 2px solid var(--gold); padding: 15px 30px; border-radius: 12px; color: var(--gold); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 30px rgba(251, 191, 36, 0.5); z-index: 200; text-align: center; animation: overlayPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes overlayPop { 0% { transform: translate(-50%, -40%) scale(0.5); opacity: 0;} 100% { transform: translate(-50%, -50%) scale(1); opacity: 1;} }
 
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .suit-selector { display: flex; justify-content: space-around; margin-top: 30px; margin-bottom: 10px;}
 .suit-btn { font-size: 3rem; background: white; width: 70px; height: 70px; border-radius: 12px; border: 2px solid #ccc; display: flex; justify-content: center; align-items: center;}
 .suit-btn:hover { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); transform: scale(1.1); }
-.delegate-buttons button { display: block; width: 100%; margin-bottom: 10px; }
-
-.audio-control { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.audio-control label { font-weight: bold; }
-.audio-control input[type="range"] { width: 60%; margin: 0; }
-
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(220, 38, 38, 0.95); padding: 12px 24px; border-radius: 8px; color: white; font-weight: bold; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-size: 1.1rem;}
 
+/* Mobile Optimization */
 @media (max-width: 768px) {
     .card-table { width: 98vw; height: 68vh; border-radius: 60px; margin-top: 100px; border-width: 2px;}
     .score-boards { top: 50px; padding: 0 5px;}
     .score-panel { min-width: 130px; padding: 6px; }
+    .team-title { font-size: 0.9rem; }
+    .score-stats { font-size: 0.75rem; }
+    .ten-icon { font-size: 0.8rem; padding: 1px 3px; }
     .game-hud { padding: 5px 10px; font-size: 0.8rem;}
     .power-color-banner { font-size: 0.9rem; }
     .playing-card { width: 55px; height: 80px; font-size: 1rem; margin-left: -35px;}
     .my-hand .playing-card.selected { transform: translateY(-15px) scale(1.05); }
+    .card-center { font-size: 1.5rem; }
     .overlay-text { font-size: 1.2rem; width: 80%; }
     .floating-btn { bottom: 100px; padding: 10px; font-size: 1rem; }
+    .pos-bottom { bottom: -10px; }
+}
+
+/* Animated Landing Page Footer Marquee */
+.footer-marquee-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    border-top: 2px solid var(--gold);
+    padding: 15px 0;
+    overflow: hidden;
+    display: flex;
+    z-index: 20;
+    backdrop-filter: blur(5px);
+}
+
+.footer-marquee {
+    display: flex;
+    width: max-content;
+    /* Change 30s to a lower number to make it scroll faster, or higher to slow it down */
+    animation: scrollLeft 30s linear infinite; 
+}
+
+.marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding-right: 40px; 
+}
+
+.marquee-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.marquee-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    margin-bottom: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Developer image specifically gets a red glowing border */
+.marquee-track .marquee-item:first-child img {
+    border-color: var(--red);
+    box-shadow: 0 0 10px var(--red);
+}
+
+.marquee-track .marquee-item:first-child span {
+    color: var(--gold);
+}
+
+@keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } 
+}
+
+/* Mobile Adjustments for Footer */
+@media (max-width: 768px) {
+    .marquee-item img {
+        width: 50px;
+        height: 50px;
+    }
+    .marquee-item {
+        font-size: 0.75rem;
+    }
+    .marquee-track {
+        gap: 25px;
+        padding-right: 25px;
+    }
+}
+
+
+/* ===== New feature styles ===== */
+
+.hint-text { font-size: 0.75rem; color: #aaa; margin: 8px 0; line-height: 1.4; }
+.lobby-footer-actions { display: flex; gap: 10px; margin-top: 1rem; }
+.lobby-footer-actions .icon-btn { flex: 0 0 auto; }
+
+/* Player list with reorder controls (creator only) */
+#player-list li { align-items: center; }
+.player-row-left { display: flex; align-items: center; gap: 8px; }
+.seat-badge { display: inline-block; min-width: 20px; text-align: center; font-size: 0.75rem; color: var(--gold); border: 1px solid var(--gold); border-radius: 50%; padding: 1px 4px; }
+.team-tag { font-size: 0.7rem; opacity: 0.8; }
+.reorder-controls { display: flex; gap: 4px; }
+.reorder-controls button { padding: 2px 8px; font-size: 0.8rem; background: rgba(255,255,255,0.15); color: white; }
+.reorder-controls button:disabled { opacity: 0.25; cursor: default; }
+
+/* Turn indicator banner */
+.turn-indicator { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); z-index: 90; background: rgba(0,0,0,0.6); color: var(--gold); padding: 4px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.5px; border: 1px solid rgba(251,191,36,0.4); transition: all 0.2s; }
+.turn-indicator.my-turn { background: var(--gold); color: var(--black); box-shadow: 0 0 15px var(--gold); }
+
+/* Sound toggle */
+#btn-sound-toggle-game { font-size: 1rem; }
+.icon-btn.sound-off { opacity: 0.5; text-decoration: line-through; }
+
+/* Played card owner-name tag */
+.played-card-name { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 0.6rem; color: var(--gold); background: rgba(0,0,0,0.7); padding: 1px 6px; border-radius: 8px; white-space: nowrap; pointer-events: none; }
+.played-left .played-card-name, .played-right .played-card-name { transform: translateX(-50%) rotate(0deg); }
+
+/* Card deal-in animation, applied to freshly rendered hand cards */
+.playing-card.card-deal-in { animation: cardDealIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+@keyframes cardDealIn {
+    0% { opacity: 0; transform: translateY(-60px) scale(0.6) rotate(-8deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+.playing-card.card-back.card-deal-in { animation: cardDealInBack 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+@keyframes cardDealInBack {
+    0% { opacity: 0; transform: scale(0.4); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Power colour reveal pop */
+.power-color-banner.power-reveal-pop span { animation: powerRevealPop 0.7s ease; }
+@keyframes powerRevealPop {
+    0% { opacity: 0; transform: scale(0.3); text-shadow: 0 0 0 transparent; }
+    50% { transform: scale(1.3); text-shadow: 0 0 25px var(--gold); }
+    100% { opacity: 1; transform: scale(1); text-shadow: 0 0 10px var(--gold-glow); }
+}
+
+/* Shuffle & Deal overlay */
+.shuffle-overlay { position: absolute; inset: 0; background: rgba(2, 6, 15, 0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
+.shuffle-stack { position: relative; width: 70px; height: 100px; margin-bottom: 20px; }
+.shuffle-card { position: absolute; top: 0; left: 0; width: 70px; height: 100px; border-radius: 8px; background: repeating-linear-gradient(45deg, #1e3a8a, #1e3a8a 5px, #1e40af 5px, #1e40af 10px); border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+.shuffle-card.c1 { animation: shuffleWiggle 0.5s ease-in-out infinite; }
+.shuffle-card.c2 { animation: shuffleWiggle 0.5s ease-in-out infinite 0.15s; }
+.shuffle-card.c3 { animation: shuffleWiggle 0.5s ease-in-out infinite 0.3s; }
+@keyframes shuffleWiggle {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-14px) rotate(-8deg); }
+    75% { transform: translateX(14px) rotate(8deg); }
+}
+.shuffle-label { color: var(--gold); font-weight: bold; letter-spacing: 1px; animation: pulseText 1s ease-in-out infinite; }
+@keyframes pulseText { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* Confetti */
+.confetti-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 600; }
+.confetti-piece { position: absolute; top: -20px; width: 8px; height: 14px; opacity: 0.9; animation: confettiFall linear forwards; }
+@keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(120vh) rotate(600deg); opacity: 0.2; }
+}
+
+@media (max-width: 768px) {
+    .turn-indicator { top: 78px; font-size: 0.75rem; padding: 3px 10px; }
 }
